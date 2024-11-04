@@ -25,8 +25,11 @@ RUN curl -s https://api.github.com/repos/pksunkara/pgx_ulid/releases/latest \
     apt install -y ./pgx_ulid.deb && \
     rm pgx_ulid.deb
 
-# Switch back to the postgres user to create the extension
+# Switch back to the postgres user
 USER postgres
 
-RUN psql -c "CREATE EXTENSION ulid;" && \
-    psql -c "ALTER SYSTEM SET shared_preload_libraries = 'ulid';"
+# Create an initialization script to create the extension and set shared_preload_libraries
+RUN echo '#!/bin/bash' > /docker-entrypoint-initdb.d/init-ulid.sh && \
+    echo 'psql -c "CREATE EXTENSION ulid;"' >> /docker-entrypoint-initdb.d/init-ulid.sh && \
+    echo 'psql -c "ALTER SYSTEM SET shared_preload_libraries = '\''ulid'\'';"' >> /docker-entrypoint-initdb.d/init-ulid.sh && \
+    chmod +x /docker-entrypoint-initdb.d/init-ulid.sh
