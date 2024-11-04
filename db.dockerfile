@@ -34,7 +34,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     /tmp/*.deb \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
-# Modify pg_hba.conf to allow connections from all IP addresses
-RUN echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
-RUN cp /usr/share/postgresql/postgresql.conf.sample /var/lib/postgresql/data/postgresql.conf && \
-    sed -i "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/" /var/lib/postgresql/data/postgresql.conf
+
