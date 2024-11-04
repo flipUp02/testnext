@@ -19,7 +19,7 @@ FROM base as pgx_ulid
 
 # Download package archive
 ARG pgx_ulid_release
-ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg16-amd64-linux-gnu.deb" \
+ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v${pgx_ulid_release}/pgx_ulid-v${pgx_ulid_release}-pg${postgresql_major}-amd64-linux-gnu.deb" \
     /tmp/pgx_ulid.deb
 
 ####################
@@ -39,3 +39,6 @@ COPY --from=extensions /tmp /tmp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     /tmp/*.deb \
     && rm -rf /var/lib/apt/lists/* /tmp/*
+
+# Modify pg_hba.conf to allow connections from all IP addresses
+RUN echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
