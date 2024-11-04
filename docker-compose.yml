@@ -39,8 +39,8 @@ services:
 #     networks:
 #       - my_network
 
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:
 
 # networks:
 #   my_network:
