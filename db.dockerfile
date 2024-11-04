@@ -41,7 +41,7 @@ USER root
 RUN mkdir -p /tmp/build \
   && cd /tmp/build \
   && git clone https://github.com/flipUp02/pgx_ulidtest\
-  && cd pgx_ulid \
+  && cd pgx_ulidtest \
   && cargo pgrx install
 
 RUN rm -fr /tmp/build \
