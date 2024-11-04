@@ -24,8 +24,8 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - my_network
+    # networks:
+    #   - my_network
 
   # cron:
   #   image: alpine/curl
@@ -42,7 +42,7 @@ services:
 volumes:
   postgres_data:
 
-networks:
-  my_network:
-    name: my_network
-    driver: bridge
+# networks:
+#   my_network:
+#     name: my_network
+#     driver: bridge
