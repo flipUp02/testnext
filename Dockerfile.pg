@@ -1,0 +1,19 @@
+# Dockerfile for PostgreSQL with pgx_ulid
+FROM postgres:latest
+
+# Install dependencies for building pgx_ulid
+RUN apt-get update && \
+    apt-get install -y postgresql-server-dev-all make gcc git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone and install pgx_ulid
+RUN git clone https://github.com/pksunkara/pgx_ulid.git /pgx_ulid && \
+    cd /pgx_ulid && \
+    LATEST_TAG=$(git tag | sort -V | tail -n 1) && \
+    git checkout "$LATEST_TAG" && \
+    make && \
+    make install && \
+    rm -rf /pgx_ulid
+
+# Enable the ULID extension and set it in shared_preload_libraries
+RUN echo "shared_preload_libraries = 'ulid'" >> /var/lib/postgresql/data/postgresql.conf
