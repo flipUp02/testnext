@@ -1,44 +1,41 @@
-ARG PG_MAJOR=17
+ARG postgresql_major=17
+ARG postgresql_release=${postgresql_major}
 
-FROM postgres:${PG_MAJOR}
+ARG pgx_ulid_release=0.1.5
 
-RUN apt-get update
+####################
+# Postgres
+####################
+FROM postgres:${postgresql_release} as base
 
-ENV build_deps ca-certificates \
-  git \
-  build-essential \
-  libpq-dev \
-  postgresql-server-dev-${PG_MAJOR} \
-  curl \
-  libreadline6-dev \
-  zlib1g-dev
+# Redeclare args for use in subsequent stages
+ARG TARGETARCH
+ARG postgresql_major
 
-RUN apt-get install -y --no-install-recommends $build_deps pkg-config cmake
+####################
+# Extension: pgx_ulid
+####################
+FROM base as pgx_ulid
 
-WORKDIR /home/postgres
+# Download package archive
+ARG pgx_ulid_release
+ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg16-amd64-linux-gnu.deb" \
+    /tmp/pgx_ulid.deb
 
-ENV HOME=/home/postgres
-ENV PATH=/home/postgres/.cargo/bin:$PATH
+####################
+# Collect extension packages
+####################
+FROM scratch as extensions
+COPY --from=pgx_ulid /tmp/*.deb /tmp/
 
-RUN chown postgres:postgres /home/postgres
+####################
+# Build final image
+####################
+FROM base as production
 
-USER postgres
+# Setup extensions
+COPY --from=extensions /tmp /tmp
 
-RUN \
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal --default-toolchain 1.74.0 && \
-  rustup --version && \
-  rustc --version && \
-  cargo --version
-
-USER root
-
-# Download and install the pgx_ulid extension
-RUN wget https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg17-amd64-linux-gnu.deb && \
-    apt install -y ./pgx_ulid-v0.1.5-pg17-amd64-linux-gnu.deb && \
-    rm pgx_ulid-v0.1.5-pg17-amd64-linux-gnu.deb
-
-# Switch back to the postgres user to create the extension
-USER postgres
-
-RUN psql -c "CREATE EXTENSION ulid;" && \
-    psql -c "ALTER SYSTEM SET shared_preload_libraries = 'ulid';"
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    /tmp/*.deb \
+    && rm -rf /var/lib/apt/lists/* /tmp/*
