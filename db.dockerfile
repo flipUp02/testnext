@@ -16,6 +16,8 @@ FROM base as pgx_ulid
 ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg16-amd64-linux-gnu.deb" \
     /tmp/pgx_ulid.deb
 
+RUN apt install /tmp/pgx_ulid.deb
+
 ####################
 # Collect extension packages
 ####################
