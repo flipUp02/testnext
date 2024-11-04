@@ -1,39 +1,48 @@
-ARG postgresql_major=17
+FROM postgres:17
+RUN apt-get update && apt-get upgrade -y
 
-####################
-# Postgres
-####################
-FROM postgres:${postgresql_major} as base
+ENV build_deps ca-certificates \
+  git \
+  build-essential \
+  libpq-dev \
+  postgresql-server-dev-17 \
+  curl \
+  libreadline6-dev \
+  zlib1g-dev
 
 
-####################
-# Extension: pgx_ulid
-####################
-FROM base as pgx_ulid
+RUN apt-get install -y --no-install-recommends $build_deps pkg-config cmake
 
-# Download package archive
+WORKDIR /home/postgres
 
-ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg16-amd64-linux-gnu.deb" \
-    /tmp/pgx_ulid.deb
+ENV HOME=/home/postgres
+ENV PATH=/home/postgres/.cargo/bin:$PATH
 
-RUN apt install /tmp/pgx_ulid.deb
+RUN chown postgres:postgres /home/postgres
 
-####################
-# Collect extension packages
-####################
-FROM scratch as extensions
-COPY --from=pgx_ulid /tmp/*.deb /tmp/
+USER postgres
 
-####################
-# Build final image
-####################
-FROM base as production
+RUN \
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal --default-toolchain nightly && \
+  rustup --version && \
+  rustc --version && \
+  cargo --version
 
-# Setup extensions
-COPY --from=extensions /tmp /tmp
+# PGX
+RUN cargo install cargo-pgrx
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    /tmp/*.deb \
-    && rm -rf /var/lib/apt/lists/* /tmp/*
+RUN cargo pgx init --pg17 $(which pg_config)
 
+USER root
+
+
+RUN mkdir -p /tmp/build \
+  && cd /tmp/build \
+  && git clone https://github.com/pksunkara/pgx_ulid \
+  && cd pgx_ulid \
+  && cargo pgx install
+
+RUN rm -fr /tmp/build \
+  && apt-get clean \
+  && apt-get autoremove -y $build_deps
 
