@@ -40,7 +40,7 @@ RUN mkdir -p /tmp/build \
   && cd /tmp/build \
   && git clone https://github.com/pksunkara/pgx_ulid \
   && cd pgx_ulid \
-  && cargo pgx install
+  && cargo pgrx install
 
 RUN rm -fr /tmp/build \
   && apt-get clean \
