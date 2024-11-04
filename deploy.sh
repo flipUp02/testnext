@@ -10,7 +10,7 @@ DOMAIN_NAME="nextselfhost.dev"
 EMAIL="your-email@example.com"
 
 # Script Vars
-REPO_URL="https://github.com/leerob/next-self-host.git"
+REPO_URL="https://github.com/flipUp02/testnext.git"
 APP_DIR=~/myapp
 SWAP_SIZE="1G"
 
