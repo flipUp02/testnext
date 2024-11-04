@@ -33,7 +33,7 @@ RUN \
 
 RUN cargo install cargo-pgrx
 
-RUN cargo pgrx init --pg${PG_MAJOR} download
+RUN cargo pgrx init --pg${PG_MAJOR} $(which pg_config)
 
 USER root
 
