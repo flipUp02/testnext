@@ -2,12 +2,12 @@
 
 # Env Vars
 POSTGRES_USER="myuser"
-# POSTGRES_PASSWORD=$(openssl rand -base64 12)
-POSTGRES_PASSWORD="myuser"
+POSTGRES_PASSWORD=$(openssl rand -base64 12)
+# POSTGRES_PASSWORD="myuser"
 POSTGRES_DB="mydatabase"
 SECRET_KEY="my-secret"
 NEXT_PUBLIC_SAFE_KEY="safe-key"
-DOMAIN_NAME="nextselfhost.dev"
+DOMAIN_NAME="localhost"
 EMAIL="your-email@example.com"
 
 # Script Vars
