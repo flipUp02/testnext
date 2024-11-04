@@ -31,7 +31,7 @@ RUN \
 # PGX
 RUN cargo install cargo-pgrx
 
-RUN cargo pgx init --pg17 $(which pg_config)
+RUN cargo pgrx init --pg17 $(which pg_config)
 
 USER root
 
