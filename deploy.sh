@@ -2,7 +2,8 @@
 
 # Env Vars
 POSTGRES_USER="myuser"
-POSTGRES_PASSWORD=$(openssl rand -base64 12)
+# POSTGRES_PASSWORD=$(openssl rand -base64 12)
+POSTGRES_PASSWORD="myuser"
 POSTGRES_DB="mydatabase"
 SECRET_KEY="my-secret"
 NEXT_PUBLIC_SAFE_KEY="safe-key"
@@ -10,6 +11,7 @@ DOMAIN_NAME="nextselfhost.dev"
 EMAIL="your-email@example.com"
 
 # Script Vars
+# REPO_URL="https://github.com/leerob/next-self-host.git"
 REPO_URL="https://github.com/flipUp02/testnext.git"
 APP_DIR=~/myapp
 SWAP_SIZE="1G"
@@ -104,6 +106,31 @@ if ! sudo docker-compose ps | grep "Up"; then
 fi
 
 
+# # Fetch the latest pgx_ulid version from GitHub
+# git clone https://github.com/pksunkara/pgx_ulid.git
+# cd pgx_ulid
+# LATEST_TAG=$(git tag | sort -V | tail -n 1)
+# git checkout "$LATEST_TAG"
+
+# # Get the installed PostgreSQL version
+# PG_VERSION=$(psql -V | grep -Po '[0-9]+\.[0-9]+')
+
+# # Update package list and install build dependencies
+# sudo apt update
+# sudo apt install -y postgresql-server-dev-all make gcc
+
+# # Build the extension
+# make && sudo make install
+
+# # Enable ULID extension and set it in shared_preload_libraries
+# sudo -u postgres psql -c "CREATE EXTENSION IF NOT EXISTS ulid;"
+# sudo -u postgres psql -c "ALTER SYSTEM SET shared_preload_libraries = 'ulid';"
+
+# # Restart PostgreSQL to apply changes
+# sudo systemctl restart postgresql
+
+# # Verify installation
+# sudo -u postgres psql -c "SHOW shared_preload_libraries;"
 
 
 # Output final message
