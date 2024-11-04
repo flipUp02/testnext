@@ -1,4 +1,4 @@
-ARG postgresql_major=${postgresql_major}
+ARG postgresql_major=17
 
 ####################
 # Postgres
