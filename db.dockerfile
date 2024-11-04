@@ -40,7 +40,7 @@ USER root
 
 RUN mkdir -p /tmp/build \
   && cd /tmp/build \
-  && git clone https://github.com/HRKings/pgx_ulid\
+  && git clone https://github.com/flipUp02/pgx_ulidtest\
   && cd pgx_ulid \
   && cargo pgrx install
 
