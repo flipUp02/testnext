@@ -1,11 +1,13 @@
-FROM postgres:17
+ARG PG_MAJOR = 16
+
+FROM postgres:${PG_MAJOR}
 RUN apt-get update && apt-get upgrade -y
 
 ENV build_deps ca-certificates \
   git \
   build-essential \
   libpq-dev \
-  postgresql-server-dev-17 \
+  postgresql-server-dev-${PG_MAJOR} \
   curl \
   libreadline6-dev \
   zlib1g-dev
@@ -31,7 +33,7 @@ RUN \
 # PGX
 RUN cargo install cargo-pgrx --version 0.11.2 --locked
 
-RUN cargo pgrx init --pg17 $(which pg_config)
+RUN cargo pgrx init --pg${PG_MAJOR} $(which pg_config)
 
 USER root
 
