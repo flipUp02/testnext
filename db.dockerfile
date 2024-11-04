@@ -1,16 +1,10 @@
-ARG postgresql_major=17
-ARG postgresql_release=${postgresql_major}
-
-ARG pgx_ulid_release=0.1.5
+ARG postgresql_major=${postgresql_major}
 
 ####################
 # Postgres
 ####################
-FROM postgres:${postgresql_release} as base
+FROM postgres:${postgresql_major} as base
 
-# Redeclare args for use in subsequent stages
-ARG TARGETARCH
-ARG postgresql_major
 
 ####################
 # Extension: pgx_ulid
@@ -18,8 +12,8 @@ ARG postgresql_major
 FROM base as pgx_ulid
 
 # Download package archive
-ARG pgx_ulid_release
-ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v${pgx_ulid_release}/pgx_ulid-v${pgx_ulid_release}-pg${postgresql_major}-amd64-linux-gnu.deb" \
+
+ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v0.1.5/pgx_ulid-v0.1.5-pg16-amd64-linux-gnu.deb" \
     /tmp/pgx_ulid.deb
 
 ####################
