@@ -31,7 +31,7 @@ RUN \
   cargo --version
 
 
-RUN cargo install cargo-pgrx --version 0.11.2 --locked
+RUN cargo install cargo-pgrx
 
 RUN cargo pgrx init --pg${PG_MAJOR} download
 
@@ -40,8 +40,8 @@ USER root
 
 RUN mkdir -p /tmp/build \
   && cd /tmp/build \
-  && git clone https://github.com/pksunkara/pgx_ulid \
-  && cd pgx_ulid \
+  && git clone https://github.com/spa5k/uids-postgres \
+  && cd uids-postgres \
   && cargo pgrx install
 
 RUN rm -fr /tmp/build \
