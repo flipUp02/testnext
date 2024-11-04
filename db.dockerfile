@@ -15,37 +15,18 @@ ENV build_deps ca-certificates \
 
 RUN apt-get install -y --no-install-recommends $build_deps pkg-config cmake
 
-WORKDIR /home/postgres
-
-ENV HOME=/home/postgres
-ENV PATH=/home/postgres/.cargo/bin:$PATH
-
-RUN chown postgres:postgres /home/postgres
-
-USER postgres
-
-RUN \
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --profile minimal --default-toolchain 1.74.0 && \
-  rustup --version && \
-  rustc --version && \
-  cargo --version
-
-# pgrx
-RUN cargo install cargo-pgrx --version 0.11.2 --locked
-
-RUN cargo pgrx init --pg${PG_MAJOR} $(which pg_config)
-
 USER root
 
-COPY . .
+# Get the latest pgx_ulid version and install it
+RUN curl -s https://api.github.com/repos/pksunkara/pgx_ulid/releases/latest \
+    | grep "browser_download_url.*pgx_ulid.*amd64-linux-gnu.deb" \
+    | cut -d '"' -f 4 \
+    | xargs curl -L -o pgx_ulid.deb && \
+    apt install -y ./pgx_ulid.deb && \
+    rm pgx_ulid.deb
 
-RUN cargo pgrx install
-
-RUN chown -R postgres:postgres /home/postgres
-RUN chown -R postgres:postgres /usr/share/postgresql/${PG_MAJOR}/extension
-RUN chown -R postgres:postgres /usr/lib/postgresql/${PG_MAJOR}/lib
-
+# Switch back to the postgres user to create the extension
 USER postgres
 
-ENV POSTGRES_HOST_AUTH_METHOD=trust
-ENV USER=postgres
+RUN psql -c "CREATE EXTENSION ulid;" && \
+    psql -c "ALTER SYSTEM SET shared_preload_libraries = 'ulid';"
