@@ -1,4 +1,4 @@
-ARG postgresql_major=16
+ARG postgresql_major=17
 
 ARG pgx_ulid_release=0.1.5
 
