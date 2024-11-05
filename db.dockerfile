@@ -41,8 +41,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
 
+# CREATE EXTENSION ulid;
+
+# EXPLAIN ANALYZE SELECT gen_ulid()  FROM generate_series(1,1000000); 
+# EXPLAIN ANALYZE SELECT gen_random_uuid()  FROM generate_series(1,1000000); 
 
 
+
+
+
+
+# //////////////////
 # ARG PG_MAJOR=16
 
 # FROM postgres:${PG_MAJOR}
