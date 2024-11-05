@@ -1,7 +1,7 @@
 ARG postgresql_major=16
 ARG postgresql_release=${postgresql_major}.2
+
 ARG pgx_ulid_release=0.1.5
-ARG TARGETARCH=amd64 # Set a default for TARGETARCH if not specified
 
 ####################
 # Postgres
@@ -17,7 +17,7 @@ ARG postgresql_major
 ####################
 FROM base as pgx_ulid
 
-# Download package archive for pgx_ulid
+# Download package archive
 ARG pgx_ulid_release
 ADD "https://github.com/pksunkara/pgx_ulid/releases/download/v${pgx_ulid_release}/pgx_ulid-v${pgx_ulid_release}-pg${postgresql_major}-${TARGETARCH}-linux-gnu.deb" \
     /tmp/pgx_ulid.deb
@@ -29,6 +29,19 @@ FROM scratch as extensions
 COPY --from=pgx_ulid /tmp/*.deb /tmp/
 
 ####################
+# Build final image
+####################
+FROM base as production
+
+# Setup extensions
+COPY --from=extensions /tmp /tmp
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    /tmp/*.deb \
+    && rm -rf /var/lib/apt/lists/* /tmp/*
+
+
+####################
 # Add pg_dump in a new stage
 ####################
 FROM base as pg_dump
@@ -37,16 +50,3 @@ FROM base as pg_dump
 RUN apt-get update && \
     apt-get install -y --no-install-recommends postgresql-client-${postgresql_major} && \
     rm -rf /var/lib/apt/lists/*
-
-####################
-# Build final image
-####################
-FROM base as production
-
-# Setup extensions and pg_dump
-COPY --from=extensions /tmp /tmp
-COPY --from=pg_dump /usr/bin/pg_dump /usr/bin/pg_dump
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    /tmp/*.deb \
-    && rm -rf /var/lib/apt/lists/* /tmp/*
